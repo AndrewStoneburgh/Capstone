@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 5fde31772d3968640a192f8b8eaefb4a
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - parent: {instanceID: 0}
+  - commandList: {fileID: 13200000, guid: e9c72c9d197c0b147a4c7eb41a433e8b, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
