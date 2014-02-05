@@ -37,11 +37,38 @@ public class Agent : MonoBehaviour
 	public bool abilityMenuAlive = false;
 	public bool infoMenuAlive = false;
 	Vector3 menuPos;
+	ArrayList movePath;
 	private int buttonHeight = 25;
+	float moveSpeed = 1.0f;
+
+	IEnumerator MoveThrough(Tile t){
+		Tile temp = t;
+		movePath.Clear();
+		while(temp != currentTile){
+			movePath.Add(temp);
+			temp = temp.parent;
+		}
+		movePath.Reverse();
+		animation.Play("run");
+		foreach(Tile ti in movePath){
+			yield return StartCoroutine(MoveTo(ti));
+		}
+		map.state = Map.GameState.SelectAgent;
+		animation.Play("idle");
+	}
+	IEnumerator MoveTo(Tile t){
+		transform.LookAt(t.center);
+		while (transform.position != t.center)
+		{
+			transform.position = Vector3.MoveTowards(transform.position, t.center, moveSpeed * Time.deltaTime);
+			yield return 0;
+		}
+	}
 
 	// Use this for initialization
 	void Start ()
 	{
+		movePath = new ArrayList();
 		menuPos = Vector3.zero;
 	}
 
@@ -51,7 +78,7 @@ public class Agent : MonoBehaviour
 		currentTile = map.tileList[(int)index.x, (int)index.y];
 		//Hard-coding 17,17 as center value for now since 33 is the smallest vertex number and thats likely what Ill be using.
 		//If I make it variable, Ill need to set this to width/2, height/2
-		gameObject.transform.position = currentTile.center + new Vector3(0, currentTile.GetComponent<MeshFilter>().mesh.vertices[(currentTile.size/2)*currentTile.size + (currentTile.size/2)].y, 0);
+		//gameObject.transform.position = currentTile.center + new Vector3(0, currentTile.GetComponent<MeshFilter>().mesh.vertices[(currentTile.size/2)*currentTile.size + (currentTile.size/2)].y, 0);
 		if (health <= 0) {
 				map.agentList.Remove (this);
 				if (map.waitList.Contains (this)) {
@@ -76,9 +103,10 @@ public class Agent : MonoBehaviour
 				map.RemoveHighlight ();
 				t.guest = this;
 				index = t.index;
-				gameObject.transform.position = new Vector3 (t.gameObject.transform.position.x, gameObject.transform.position.y, t.gameObject.transform.position.z);
+				//gameObject.transform.position = new Vector3 (t.gameObject.transform.position.x, gameObject.transform.position.y, t.gameObject.transform.position.z);
 				currentChoice = 0;
 				hasMoved = true;
+				StartCoroutine(MoveThrough(t));
 				return true;
 				} else {
 					return false;
@@ -111,16 +139,8 @@ public class Agent : MonoBehaviour
 
 	public virtual void OnMouseDown ()
 	{
-		//This is an inelegant way of making it so the player can't do anything while the game waits for confirmation on an action.
-		if(map.state != Map.GameState.ConfirmAction){
-			map.agentClicked (this);
-			menuPos = new Vector3(Input.mousePosition.x, Screen.height - Input.mousePosition.y, Input.mousePosition.z);
-			if(map.waitList.First() == this){
-				abilityMenuAlive = !abilityMenuAlive;
-			}else{
-				infoMenuAlive = !infoMenuAlive;
-			}
-		}
+		map.agentClicked (this);
+		menuPos = new Vector3(Input.mousePosition.x, Screen.height - Input.mousePosition.y, Input.mousePosition.z);
 	}
 	public virtual void OnGUI(){
 		if(abilityMenuAlive){
@@ -228,7 +248,7 @@ public class Agent : MonoBehaviour
 				this.map.tileList[i, j].f = 0;
 				this.map.tileList[i, j].h = 0;
 				this.map.tileList[i, j].state = Tile.State.Default;
-				this.map.tileList[i, j].parent = null;
+				//this.map.tileList[i, j].parent = null;
 			}
 		}
 		start = this.map.tileList[(int)this.index.x, (int)this.index.y];
@@ -274,7 +294,7 @@ public class Agent : MonoBehaviour
 				}
 			}*/
 			//Set parent node
-			//lowestF.parent = CreateMap.floor[m_x,m_y].GetComponent<Node>();
+			//lowestF.parent = this.map.tileList[m_x, m_y];
 			m_x = (int)lowestF.index.x;
 			m_y = (int)lowestF.index.y;
 		}

@@ -8,6 +8,7 @@ public class Map : MonoBehaviour {
 		SelectAgent,
 		ConfirmAction,
 		SelectTarget,
+		ActionInProgress,
 		Menu,
 		End
 	}
@@ -50,7 +51,7 @@ public class Map : MonoBehaviour {
 	Vector3 confirmDialogue;
 
 	//33 is the smallest size allowed
-	int verts = 33;
+	int verts = 17;
 	float angle = 0.4f;
 
 	void Start () {
@@ -91,7 +92,7 @@ public class Map : MonoBehaviour {
 		//leftCam.transform.position = new Vector3(focus.transform.localPosition.x + 1, focus.transform.localPosition.y, focus.transform.localPosition.z); 
 		leftCam.transform.rotation = focus.transform.rotation;
 		leftCam.transform.position = focus.transform.position;
-		leftCam.transform.Translate(new Vector3(0,targetHeight,0.3f), Space.Self);
+		leftCam.transform.Translate(new Vector3(0,targetHeight,0.5f), Space.Self);
 		leftCam.transform.LookAt(focus.transform.position + new Vector3(0, targetHeight, 0));
 		//Temp fix. Set tiles white. If state == selectaction, set red.
 		if(Input.GetKey(KeyCode.UpArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(0,0,.1f); };
@@ -110,6 +111,8 @@ public class Map : MonoBehaviour {
 			End();
 			break;
 		case GameState.ConfirmAction:
+			break;
+		case GameState.ActionInProgress:
 			break;
 		case GameState.SelectTarget:
 			if(waitList.First().hasActed && waitList.First().hasMoved){
@@ -233,9 +236,16 @@ public class Map : MonoBehaviour {
 			break;
 		case GameState.Menu:
 			break;
+		case GameState.ActionInProgress:
+			break;
 		case GameState.SelectAgent:
 			if(t.guest != null){
 				setFocus(t.guest);
+				if(waitList.First() == t.guest){
+					t.guest.abilityMenuAlive = !t.guest.abilityMenuAlive;
+				}else{
+					t.guest.infoMenuAlive = !t.guest.infoMenuAlive;
+				}
 			}
 			break;
 		case GameState.ConfirmAction:

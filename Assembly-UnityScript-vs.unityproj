@@ -52,6 +52,7 @@
      <None Include="assets\standard assets\toon shading\sources\Shaders\Toony-BasicOutline.shader" />
      <None Include="assets\standard assets\toon shading\sources\Shaders\Toony-LightedOutline.shader" />
      <None Include="assets\standard assets\toon shading\sources\Shaders\Toony-Lighted.shader" />
+     <None Include="assets\taskList.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
