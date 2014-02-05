@@ -71,7 +71,7 @@ public class Agent : MonoBehaviour
 			return false;
 		case 1:
 		//If target is within range
-			if (t.inRange && (t.guest == null || t.guest == this) && hasMoved == false) {
+			if (t.dist(currentTile) <= range && t.dist(currentTile) != 0 && (t.guest == null || t.guest == this) && hasMoved == false) {
 				map.tileList [(int)index.x, (int)index.y].guest = null;
 				map.RemoveHighlight ();
 				t.guest = this;
@@ -84,7 +84,9 @@ public class Agent : MonoBehaviour
 					return false;
 				}
 		case 2:
-			if (t.dist (map.tileList [(int)index.x, (int)index.y]) <= attackRange && t.dist (map.tileList [(int)index.x, (int)index.y]) > 0 && hasActed == false) {
+			//You may attack an empty square, but the actions dont trigger(no threat increase)
+			if (t.dist(currentTile) <= attackRange && t.dist (map.tileList [(int)index.x, (int)index.y]) > 0 && hasActed == false
+			    && t.guest != null) {
 				map.tileList [(int)t.index.x, (int)t.index.y].guest.health -= damage;
 				threat += damage * threatMultiplier;
 				}
@@ -98,6 +100,7 @@ public class Agent : MonoBehaviour
 		//This will trigger a turn end. Should eventually be changed so that ending a turn without doing both actions saves CT
 			hasActed = true;
 			hasMoved = true;
+			map.state = Map.GameState.End;
 			return true;
 		case 5:
 			return false;
@@ -131,25 +134,31 @@ public class Agent : MonoBehaviour
 	}
 	void BuildMenu(float x, float y, int width, int height){
 		GUI.Box(new Rect(menuPos.x, menuPos.y, width, height), name);
-		if(GUI.Button(new Rect(menuPos.x + 5, menuPos.y + buttonHeight, width - 10, buttonHeight), "Move")){
+		if(GUI.Button(new Rect(menuPos.x + 5, menuPos.y + buttonHeight, width - 10, buttonHeight), "Move")
+		   && hasMoved == false){
 			currentChoice = 1;
 			map.state = Map.GameState.SelectTarget;
 			map.Highlight(this, Color.blue, range);
 			abilityMenuAlive = false;
 		}
-		if(GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 2*buttonHeight, width - 10, buttonHeight), "Attack")){
+		if(GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 2*buttonHeight, width - 10, buttonHeight), "Attack")
+		   && hasActed == false){
 			currentChoice = 2;
 			map.state = Map.GameState.SelectTarget;
 			map.Highlight(this, Color.red, attackRange);
 			abilityMenuAlive = false;
 		}
-		if(GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 3*buttonHeight, width - 10, buttonHeight), "Special")){
+		if(GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 3*buttonHeight, width - 10, buttonHeight), "Special")
+		   && hasActed == false){
 			currentChoice = 3;
 			map.state = Map.GameState.SelectTarget;
 			abilityMenuAlive = false;
 		}
 		if(GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 4*buttonHeight, width - 10, buttonHeight), "End Turn")){
 			currentChoice = 4;
+			//I tried to keep this code to just modify choice but for end turn we need to circumvent the target select option.
+			//Once I have a 'confirm choice' enabled, we can jump directly there, probably
+			Action(currentTile);
 			map.state = Map.GameState.SelectTarget;
 			abilityMenuAlive = false;
 		}

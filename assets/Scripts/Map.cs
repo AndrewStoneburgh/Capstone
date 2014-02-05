@@ -52,7 +52,6 @@ public class Map : MonoBehaviour {
 	float angle = 0.4f;
 
 	void Start () {
-
 		rightCam.gameObject.SetActive(false);
 		cursor = (GameObject)Instantiate(cursorPrefab);
 		TerrainBuilder tb;
@@ -73,7 +72,6 @@ public class Map : MonoBehaviour {
 	}
 
 	void Update () {
-		rightCam.gameObject.SetActive(true);
 		cursor.transform.Rotate(new Vector3(0, 0, angle));
 		cursor.transform.position = new Vector3(focus.transform.position.x, cursor.transform.position.y, focus.transform.position.z);
 		switch(focus.alignment){
@@ -94,16 +92,14 @@ public class Map : MonoBehaviour {
 		leftCam.transform.Translate(new Vector3(0,targetHeight,0.3f), Space.Self);
 		leftCam.transform.LookAt(focus.transform.position + new Vector3(0, targetHeight, 0));
 		//Temp fix. Set tiles white. If state == selectaction, set red.
-		foreach(Tile t in tileList){
-			if(t.inRange != true){
-				t.setColor(Color.white);
-			}
-		}
 		if(Input.GetKey(KeyCode.UpArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(0,0,.1f); };
 		if(Input.GetKey(KeyCode.DownArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(0,0,-.1f); };
 		if(Input.GetKey(KeyCode.LeftArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(-.1f,0,0); };
 		if(Input.GetKey(KeyCode.RightArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(.1f,0,0); };
 		if(Input.GetKeyDown(KeyCode.R)){ rising = !rising;}
+		if(waitList.First().hasActed && waitList.First().hasMoved){
+			state = GameState.End;
+		}
 		switch(state)
 		{
 		case GameState.End:
@@ -113,20 +109,6 @@ public class Map : MonoBehaviour {
 			waitList.First().CT -= 100;
 			waitList.RemoveAt(0);
 			End();
-			break;
-		case GameState.Menu:
-			break;
-		case GameState.SelectAgent:
-			if(waitList.First().hasActed && waitList.First().hasMoved){
-				state = GameState.End;
-			}
-			break;
-		case GameState.ConfirmAction:
-			break;
-		case GameState.SelectTarget:
-			if(waitList.First().hasActed && waitList.First().hasMoved){
-				state = GameState.End;
-			}
 			break;
 		default:
 			break;
@@ -163,12 +145,12 @@ public class Map : MonoBehaviour {
 
 		agentList.OrderBy(Agent => Agent.CT);
 		agentList.Reverse();
-		setFocus(waitList.First());
 		if(waitList.First().name == "ComputerAgent(Clone)"){
 			AIStep();
 		}else{
 			state = GameState.SelectAgent;
 		}
+		setFocus(waitList.First());
 	}
 	void setFocus(Agent a){
 		//RemoveHighlight();
@@ -233,6 +215,9 @@ public class Map : MonoBehaviour {
 				state = GameState.SelectAgent;
 			}else{
 				state = GameState.SelectAgent;
+			}
+			foreach(Tile ti in tileList){
+				ti.setColor(Color.white);
 			}
 			break;
 		default:
