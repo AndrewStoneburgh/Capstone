@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class Map : MonoBehaviour {
 	public enum GameState{
 		SelectAgent,
-		SelectAction,
+		ConfirmAction,
 		SelectTarget,
 		Menu,
 		End
@@ -43,13 +43,17 @@ public class Map : MonoBehaviour {
 	float direction = 1;
 	bool rising = false;
 	TerrainBuilder tb;
+	public Camera leftCam;
+	public Camera rightCam;
+	float targetHeight = 0.65f;
 
 	//33 is the smallest size allowed
 	int verts = 33;
 	float angle = 0.4f;
 
 	void Start () {
-		
+
+		rightCam.gameObject.SetActive(false);
 		cursor = (GameObject)Instantiate(cursorPrefab);
 		TerrainBuilder tb;
 		tb = new TerrainBuilder();
@@ -69,9 +73,26 @@ public class Map : MonoBehaviour {
 	}
 
 	void Update () {
+		rightCam.gameObject.SetActive(true);
 		cursor.transform.Rotate(new Vector3(0, 0, angle));
-		TweenHeight();
-		//Highlight(focus);
+		cursor.transform.position = new Vector3(focus.transform.position.x, cursor.transform.position.y, focus.transform.position.z);
+		switch(focus.alignment){
+		case 0: cursor.renderer.material.color = Color.gray;
+			break;
+		case 1: cursor.renderer.material.color = Color.green;
+			break;
+		case 2: cursor.renderer.material.color = Color.red;
+			break;
+		case 3: cursor.renderer.material.color = Color.blue;
+			break;
+		default:
+			break;
+		}
+		//leftCam.transform.position = new Vector3(focus.transform.localPosition.x + 1, focus.transform.localPosition.y, focus.transform.localPosition.z); 
+		leftCam.transform.rotation = focus.transform.rotation;
+		leftCam.transform.position = focus.transform.position;
+		leftCam.transform.Translate(new Vector3(0,targetHeight,0.3f), Space.Self);
+		leftCam.transform.LookAt(focus.transform.position + new Vector3(0, targetHeight, 0));
 		//Temp fix. Set tiles white. If state == selectaction, set red.
 		foreach(Tile t in tileList){
 			if(t.inRange != true){
@@ -89,69 +110,27 @@ public class Map : MonoBehaviour {
 			//These two commands need to run every time End() does, but are outside of it
 			//so that End() can be called once at the start of the game without having anything
 			//in the waitlist.
-			focus.CT -= 100;
+			waitList.First().CT -= 100;
 			waitList.RemoveAt(0);
 			End();
 			break;
 		case GameState.Menu:
-			Menu();
 			break;
 		case GameState.SelectAgent:
-			//Do nothing. Awaiting player selection
 			if(waitList.First().hasActed && waitList.First().hasMoved){
 				state = GameState.End;
 			}
 			break;
-		case GameState.SelectAction:
-			if(waitList.First().hasActed && waitList.First().hasMoved){
-				state = GameState.End;
-			}
-			foreach(Tile t in tileList){
-				if(t.inRange){
-					t.setColor(Color.red);
-				}
-			}
-			//This will need to be made dynamic (maybe call agent.handlekey())
-			if(Input.GetKeyDown(KeyCode.Alpha1)){
-				focus.currentChoice = 1;
-				state = GameState.SelectTarget;
-			}
-			if(Input.GetKeyDown(KeyCode.Alpha2)){
-				focus.currentChoice = 2;
-				state = GameState.SelectTarget;
-			}
-			if(Input.GetKeyDown(KeyCode.Alpha3)){
-				focus.currentChoice = 3;
-				state = GameState.SelectTarget;
-			}
-			if(Input.GetKeyDown(KeyCode.Alpha4)){
-				focus.currentChoice = 4;
-				state = GameState.SelectTarget;
-			}
-			if(Input.GetKeyDown(KeyCode.Escape)){ 
-
-			}
+		case GameState.ConfirmAction:
 			break;
 		case GameState.SelectTarget:
 			if(waitList.First().hasActed && waitList.First().hasMoved){
 				state = GameState.End;
 			}
-			/*//Do nothing, wait for input
-			foreach(Tile t in tileList){
-				if(t.inRange){
-					t.setColor(Color.green);
-				}
-			}*/
 			break;
 		default:
 			break;
 		}
-	}
-	void PlayerTurn(){
-	}
-	void EnemyTurn(){
-	}
-	void Menu(){
 	}
 	void TweenHeight(){
 		if(rising){
@@ -182,8 +161,8 @@ public class Map : MonoBehaviour {
 			}
 		}
 
-			agentList.OrderBy(Agent => Agent.CT);
-			agentList.Reverse();
+		agentList.OrderBy(Agent => Agent.CT);
+		agentList.Reverse();
 		setFocus(waitList.First());
 		if(waitList.First().name == "ComputerAgent(Clone)"){
 			AIStep();
@@ -193,24 +172,19 @@ public class Map : MonoBehaviour {
 	}
 	void setFocus(Agent a){
 		//RemoveHighlight();
+		focus.gameObject.layer = 0;
+		foreach(Transform t in focus.transform){
+			t.gameObject.layer = 0;
+		}
 		focus = a;
+		focus.gameObject.layer = 8;
+		foreach(Transform t in focus.transform){
+			t.gameObject.layer = 8;
+		}
 		//Highlight(focus);
 		//Camera.main.transform.LookAt(focus.transform.position);
 	}
 	public void Highlight(Agent a, Color c, int range){
-		cursor.transform.position = new Vector3(focus.transform.position.x, cursor.transform.position.y, focus.transform.position.z);
-		switch(a.alignment){
-			case 0: cursor.renderer.material.color = Color.gray;
-				break;
-			case 1: cursor.renderer.material.color = Color.green;
-				break;
-			case 2: cursor.renderer.material.color = Color.red;
-				break;
-			case 3: cursor.renderer.material.color = Color.blue;
-				break;
-			default:
-				break;
-			}
 		ArrayList endList = new ArrayList();
 		for(int i = 0; i < width; i++){
 			for(int j = 0; j < length; j++){
@@ -244,17 +218,19 @@ public class Map : MonoBehaviour {
 			End();
 			break;
 		case GameState.Menu:
-			Menu();
 			break;
 		case GameState.SelectAgent:
-			//Highlight(t.guest);
+			if(t.guest != null){
+				setFocus(t.guest);
+			}
 			break;
-		case GameState.SelectAction:
+		case GameState.ConfirmAction:
 			//Do nothing. Awaiting action selectiong.
 			break;
 		case GameState.SelectTarget:
+			//True and false set to the same for now. Cancelling an action, confirming an action or failing should all return the player to agent selection
 			if(focus.Action(t)){
-				state = GameState.SelectAction;
+				state = GameState.SelectAgent;
 			}else{
 				state = GameState.SelectAgent;
 			}
@@ -313,7 +289,6 @@ public class Map : MonoBehaviour {
 			a1.transform.position = tileList[ii, 0].center;
 			tileList[ii, 0].guest = a1;
 			agentList.Add(a1);
-			//focus = a1;
 			a1.alignment = 1;
 			a1.map = this;
 		}

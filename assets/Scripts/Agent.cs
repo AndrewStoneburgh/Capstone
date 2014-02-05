@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Agent : MonoBehaviour
 {
@@ -33,6 +35,7 @@ public class Agent : MonoBehaviour
 	public Tile currentTile;
 	private int m_x, m_y;
 	public bool abilityMenuAlive = false;
+	public bool infoMenuAlive = false;
 	Vector3 menuPos;
 	private int buttonHeight = 25;
 
@@ -49,22 +52,18 @@ public class Agent : MonoBehaviour
 		//Hard-coding 17,17 as center value for now since 33 is the smallest vertex number and thats likely what Ill be using.
 		//If I make it variable, Ill need to set this to width/2, height/2
 		gameObject.transform.position = currentTile.center + new Vector3(0, currentTile.GetComponent<MeshFilter>().mesh.vertices[(currentTile.size/2)*currentTile.size + (currentTile.size/2)].y, 0);
-			if (health <= 0) {
-					map.agentList.Remove (this);
-					if (map.waitList.Contains (this)) {
-							map.waitList.Remove (this);
-					}
-					Destroy (gameObject);
-			}
-			/*if (Map.focus == this) {
-					gameObject.renderer.material.color = Color.blue;
-			} else {
-					gameObject.renderer.material.color = Color.green;
-			}*/
+		if (health <= 0) {
+				map.agentList.Remove (this);
+				if (map.waitList.Contains (this)) {
+						map.waitList.Remove (this);
+				}
+				Destroy (gameObject);
+		}
 	}
 
 	public virtual bool Action (Tile t)
 	{
+		abilityMenuAlive = false;
 		//Actions need default threat values
 		switch (currentChoice) {
 		case 0:
@@ -111,6 +110,11 @@ public class Agent : MonoBehaviour
 	{
 		map.agentClicked (this);
 		menuPos = new Vector3(Input.mousePosition.x, Screen.height - Input.mousePosition.y, Input.mousePosition.z);
+		if(map.waitList.First() == this){
+			abilityMenuAlive = !abilityMenuAlive;
+		}else{
+			infoMenuAlive = !infoMenuAlive;
+		}
 	}
 	public virtual void OnGUI(){
 		if(abilityMenuAlive){
