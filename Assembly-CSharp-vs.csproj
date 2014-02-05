@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{565BE789-4AC6-D903-5C27-416A58DF6DCD}</ProjectGuid>
+	<ProjectGuid>{1EE98971-DB57-CCE3-EB35-7D60258BAC4D}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -57,7 +57,6 @@
      <Compile Include="assets\Scripts\Tank.cs" />
      <Compile Include="assets\Scripts\TerrainBuilder.cs" />
      <Compile Include="assets\Scripts\Tile.cs" />
-     <Compile Include="assets\Scripts\UI.cs" />
      <None Include="assets\standard assets\toon shading\sources\Shaders\Toony-Basic.shader" />
      <None Include="assets\standard assets\Skyboxes\_skybox info.txt" />
      <None Include="assets\standard assets\toon shading\sources\Shaders\Toony-BasicOutline.shader" />
