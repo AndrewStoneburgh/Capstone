@@ -78,10 +78,10 @@ public class Map : MonoBehaviour {
 				t.setColor(Color.white);
 			}
 		}
-		if(Input.GetKey(KeyCode.UpArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(0,0,1); };
-		if(Input.GetKey(KeyCode.DownArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(0,0,-1); };
-		if(Input.GetKey(KeyCode.LeftArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(-1,0,0); };
-		if(Input.GetKey(KeyCode.RightArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(1,0,0); };
+		if(Input.GetKey(KeyCode.UpArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(0,0,.1f); };
+		if(Input.GetKey(KeyCode.DownArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(0,0,-.1f); };
+		if(Input.GetKey(KeyCode.LeftArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(-.1f,0,0); };
+		if(Input.GetKey(KeyCode.RightArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(.1f,0,0); };
 		if(Input.GetKeyDown(KeyCode.R)){ rising = !rising;}
 		switch(state)
 		{
@@ -184,11 +184,6 @@ public class Map : MonoBehaviour {
 
 			agentList.OrderBy(Agent => Agent.CT);
 			agentList.Reverse();
-			GameObject.Find("Turn Order").guiText.text = "Turn Order: ";
-			foreach(Agent a in agentList){
-				GameObject.Find("Turn Order").guiText.text += a.name +  " , ";
-			}
-
 		setFocus(waitList.First());
 		if(waitList.First().name == "ComputerAgent(Clone)"){
 			AIStep();
@@ -202,7 +197,7 @@ public class Map : MonoBehaviour {
 		//Highlight(focus);
 		//Camera.main.transform.LookAt(focus.transform.position);
 	}
-	public void Highlight(Agent a, int range){
+	public void Highlight(Agent a, Color c, int range){
 		cursor.transform.position = new Vector3(focus.transform.position.x, cursor.transform.position.y, focus.transform.position.z);
 		switch(a.alignment){
 			case 0: cursor.renderer.material.color = Color.gray;
@@ -234,100 +229,13 @@ public class Map : MonoBehaviour {
 				t.setColor(c);
 			}
 		}
-		/*
-		//Color c = Color.red;
-		int y = 1;
-		bool isIncreasing = true;
-		for(int x = -a.range; x <= a.range; x++){
-			for(int i = 0; i < y; i++){
-				if((int)a.index.x + x >= 0 && (int)a.index.x + x < width){
-					tileList[(int)a.index.x + x, (int)a.index.y].inRange = true;
-					if((int)a.index.y + i >= 0 && (int)a.index.y + i < length){
-						tileList[(int)a.index.x + x, (int)a.index.y + i].inRange = true;
-					}
-					if((int)a.index.y - i >= 0 && (int)a.index.y - i < length){
-						tileList[(int)a.index.x + x, (int)a.index.y - i].inRange = true;
-					}
-				}
-			}
-			//Worst decision statement ever, fix later
-			if(y <= a.range){
-
-			}else{
-				isIncreasing = false;
-			}
-			if(isIncreasing){
-				y++;
-			}else{
-				y--;
-			}
-		}*/
 	}
 	public void RemoveHighlight(){
 		focus.RemoveMovable();
 		focus.abilityMenuAlive = false;
-		/*//Color c = Color.white;
-		int y = 1;
-		bool isIncreasing = true;
-		for(int x = -focus.range; x <= focus.range; x++){
-			for(int i = 0; i < y; i++){
-				if((int)focus.index.x + x >= 0 && (int)focus.index.x + x < width){
-					tileList[(int)focus.index.x + x, (int)focus.index.y].inRange = false;
-					if((int)focus.index.y + i >= 0 && (int)focus.index.y + i < length){
-						tileList[(int)focus.index.x + x, (int)focus.index.y + i].inRange = false;
-					}
-					if((int)focus.index.y - i >= 0 && (int)focus.index.y - i < length){
-						tileList[(int)focus.index.x + x, (int)focus.index.y - i].inRange = false;
-					}
-				}
-			}
-			//Worst decision statement ever, fix later
-			if(y <= focus.range){
-				
-			}else{
-				isIncreasing = false;
-			}
-			if(isIncreasing){
-				y++;
-			}else{
-				y--;
-			}
-		}*/
 	}
 	public void agentClicked(Agent a){
 		tileClicked(tileList[(int)a.index.x, (int)a.index.y]);
-		/*RemoveHighlight();
-		switch(state)
-		{
-		case GameState.End:
-			End();
-			break;
-		case GameState.Menu:
-			Menu();
-			break;
-		case GameState.SelectAgent:
-			//RemoveHighlight();
-			setFocus(a);
-			//If you click the agent, move on to action selection. Else, do nothing
-			if(a == waitList.First()){
-				//state = GameState.SelectAction;
-				Highlight(a, Color.green, a.range);
-				a.abilityMenuAlive = true;
-			}else{
-				Highlight(a, Color.gray, a.range);
-			}
-			break;
-		case GameState.SelectAction:
-			//N
-			break;
-		case GameState.SelectTarget:
-			//A shortcut so that selecting an agent or a tile trigger the same code.
-			//Overall this will cause more lines to be run but shouldn't impact performance.
-			tileClicked(tileList[(int)a.index.x, (int)a.index.y]);
-			break;
-		default:
-			break;
-		}*/
 	}
 	public void tileClicked(Tile t){
 		switch(state)
@@ -339,7 +247,7 @@ public class Map : MonoBehaviour {
 			Menu();
 			break;
 		case GameState.SelectAgent:
-			Highlight(t.guest);
+			//Highlight(t.guest);
 			break;
 		case GameState.SelectAction:
 			//Do nothing. Awaiting action selectiong.
@@ -377,27 +285,6 @@ public class Map : MonoBehaviour {
 		}
 	}
 	void AIStep(){
-		/*threatList = new List<Agent>(agentList);
-		//Iterate through all agents and remove any sharing an alignment with the current focus.
-		//This is setting up a list of all agents that are on different teams than the focus.
-		for(int i = threatList.Count() - 1; i >= 0; i--){
-			if(threatList.ElementAt(i).alignment == focus.alignment){
-				threatList.RemoveAt(i);
-			}
-		}
-		//Order list of enemies in descending order of threat
-		threatList.OrderBy(Agent => Agent.threat);
-		threatList.Reverse();
-		foreach(Agent a in threatList){
-			Debug.Log("Name : " + a.name + ", Threat : " + a.threat);
-		}*/
-		/*foreach(Agent a in threatList){
-			if(Mathf.Abs(focus.index.x - a.index.x) + Mathf.Abs(focus.index.y - a.index.y) <= focus.range + 1){
-				(ComputerAgent)focus.target = a;
-			}
-		}*/
-		//((ComputerAgent)focus).target = threatList.First();
-		//The above method(commented out) was not working for some reason. Each iteration, the list was being overwritten.
 		//The below method grabs the first non-allied agent and sets it as the highest threat target.
 		//It then does a sort to see if any other non-allied agents have higher threat.
 		Agent highestThreat = null;

@@ -53,11 +53,14 @@ public class Tile : MonoBehaviour {
 		guest = null;
 	}
 	void OnMouseEnter(){
-		//gameObject.renderer.material.color = Color.green;
-		//Debug.Log("( " + index.x + " , " + index.y + " )");
+		Color c = GetComponent<MeshRenderer>().materials[1].color;
+		c.a = 0.3f;
+		GetComponent<MeshRenderer>().sharedMaterials[1].color = c;
 	}
 	void OnMouseExit(){
-		//gameObject.renderer.material.color = Color.white;
+		Color c = GetComponent<MeshRenderer>().materials[1].color;
+		c.a = 0.0f;
+		GetComponent<MeshRenderer>().sharedMaterials[1].color = c;
 	}
 	void OnMouseDown(){
 		map.tileClicked(this);
