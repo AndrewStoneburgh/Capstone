@@ -111,12 +111,15 @@ public class Agent : MonoBehaviour
 
 	public virtual void OnMouseDown ()
 	{
-		map.agentClicked (this);
-		menuPos = new Vector3(Input.mousePosition.x, Screen.height - Input.mousePosition.y, Input.mousePosition.z);
-		if(map.waitList.First() == this){
-			abilityMenuAlive = !abilityMenuAlive;
-		}else{
-			infoMenuAlive = !infoMenuAlive;
+		//This is an inelegant way of making it so the player can't do anything while the game waits for confirmation on an action.
+		if(map.state != Map.GameState.ConfirmAction){
+			map.agentClicked (this);
+			menuPos = new Vector3(Input.mousePosition.x, Screen.height - Input.mousePosition.y, Input.mousePosition.z);
+			if(map.waitList.First() == this){
+				abilityMenuAlive = !abilityMenuAlive;
+			}else{
+				infoMenuAlive = !infoMenuAlive;
+			}
 		}
 	}
 	public virtual void OnGUI(){

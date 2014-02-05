@@ -46,6 +46,8 @@ public class Map : MonoBehaviour {
 	public Camera leftCam;
 	public Camera rightCam;
 	float targetHeight = 0.65f;
+	Tile pendingTarget;
+	Vector3 confirmDialogue;
 
 	//33 is the smallest size allowed
 	int verts = 33;
@@ -97,9 +99,6 @@ public class Map : MonoBehaviour {
 		if(Input.GetKey(KeyCode.LeftArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(-.1f,0,0); };
 		if(Input.GetKey(KeyCode.RightArrow)){ GameObject.Find("Main Camera").transform.position = GameObject.Find("Main Camera").transform.position + new Vector3(.1f,0,0); };
 		if(Input.GetKeyDown(KeyCode.R)){ rising = !rising;}
-		if(waitList.First().hasActed && waitList.First().hasMoved){
-			state = GameState.End;
-		}
 		switch(state)
 		{
 		case GameState.End:
@@ -110,8 +109,41 @@ public class Map : MonoBehaviour {
 			waitList.RemoveAt(0);
 			End();
 			break;
+		case GameState.ConfirmAction:
+			break;
+		case GameState.SelectTarget:
+			if(waitList.First().hasActed && waitList.First().hasMoved){
+				state = GameState.End;
+			}
+			break;
+		case GameState.SelectAgent:
+			if(waitList.First().hasActed && waitList.First().hasMoved){
+				state = GameState.End;
+			}
+			break;
 		default:
 			break;
+		}
+	}
+	void OnGUI(){
+		if(state == GameState.ConfirmAction){
+			if(GUI.Button(new Rect(confirmDialogue.x, confirmDialogue.y , 75, 25), "Confirm")){
+				//True and false set to the same for now. Cancelling an action, confirming an action or failing should all return the player to agent selection
+				if(focus.Action(pendingTarget)){
+					state = GameState.SelectAgent;
+				}else{
+					state = GameState.SelectAgent;
+				}
+				foreach(Tile ti in tileList){
+					ti.setColor(Color.white);
+				}
+			}
+			if(GUI.Button(new Rect(confirmDialogue.x, confirmDialogue.y +25 , 75, 25), "Cancel")){
+				state = GameState.SelectAgent;
+				foreach(Tile ti in tileList){
+					ti.setColor(Color.white);
+				}
+			}
 		}
 	}
 	void TweenHeight(){
@@ -210,15 +242,9 @@ public class Map : MonoBehaviour {
 			//Do nothing. Awaiting action selectiong.
 			break;
 		case GameState.SelectTarget:
-			//True and false set to the same for now. Cancelling an action, confirming an action or failing should all return the player to agent selection
-			if(focus.Action(t)){
-				state = GameState.SelectAgent;
-			}else{
-				state = GameState.SelectAgent;
-			}
-			foreach(Tile ti in tileList){
-				ti.setColor(Color.white);
-			}
+			pendingTarget = t;
+			confirmDialogue = new Vector3(Input.mousePosition.x, Screen.height - Input.mousePosition.y, 0);
+			state = GameState.ConfirmAction;
 			break;
 		default:
 			break;
