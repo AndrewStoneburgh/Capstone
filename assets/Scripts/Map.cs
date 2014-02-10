@@ -298,7 +298,7 @@ public class Map : MonoBehaviour {
 			}
 		}
 		((ComputerAgent)focus).target = highestThreat;
-		if(focus.Action(tileList[(int)((ComputerAgent)focus).target.index.x, (int)((ComputerAgent)focus).target.index.y])){
+		if(focus.Action(tileList[(int)highestThreat.index.x, (int)highestThreat.index.y])){
 			state = GameState.End;
 		}
 	}

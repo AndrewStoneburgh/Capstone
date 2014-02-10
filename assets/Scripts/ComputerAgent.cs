@@ -22,6 +22,7 @@ public class ComputerAgent : Agent
 		map.RemoveHighlight ();
 		tempTarget.guest = this;
 		index = tempTarget.index;
+		//StartCoroutine(MoveThrough(tempTarget));
 		gameObject.transform.position = new Vector3 (tempTarget.gameObject.transform.position.x, gameObject.transform.position.y, tempTarget.gameObject.transform.position.z);
 		if (dist (t) == 1) {
 			map.tileList[(int)t.index.x, (int)t.index.y].guest.health -= damage;

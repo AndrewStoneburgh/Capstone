@@ -41,7 +41,7 @@ public class Agent : MonoBehaviour
 	private int buttonHeight = 25;
 	float moveSpeed = 1.0f;
 
-	IEnumerator MoveThrough(Tile t){
+	protected IEnumerator MoveThrough(Tile t){
 		Tile temp = t;
 		movePath.Clear();
 		while(temp != currentTile){
@@ -56,7 +56,7 @@ public class Agent : MonoBehaviour
 		map.state = Map.GameState.SelectAgent;
 		animation.Play("idle");
 	}
-	IEnumerator MoveTo(Tile t){
+	protected IEnumerator MoveTo(Tile t){
 		transform.LookAt(t.center);
 		while (transform.position != t.center)
 		{
@@ -98,7 +98,8 @@ public class Agent : MonoBehaviour
 			return false;
 		case 1:
 		//If target is within range
-			if (t.dist(currentTile) <= range && t.dist(currentTile) != 0 && (t.guest == null || t.guest == this) && hasMoved == false) {
+			if (t.dist(currentTile) <= range && t.dist(currentTile) != 0 && (t.guest == null || t.guest == this) && hasMoved == false
+			    && t.inRange) {
 				map.tileList [(int)index.x, (int)index.y].guest = null;
 				map.RemoveHighlight ();
 				t.guest = this;
