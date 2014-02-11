@@ -46,7 +46,7 @@ public class Map : MonoBehaviour {
 	TerrainBuilder tb;
 	public Camera leftCam;
 	public Camera rightCam;
-	float targetHeight = 0.65f;
+	float targetHeight = 1.05f;
 	Tile pendingTarget;
 	Vector3 confirmDialogue;
 

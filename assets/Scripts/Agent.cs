@@ -36,11 +36,15 @@ public class Agent : MonoBehaviour
 	private int m_x, m_y;
 	public bool abilityMenuAlive = false;
 	public bool infoMenuAlive = false;
+	//for point burst
 	public bool pointBurst = false;
+	public string damageText;
+	public Vector3 pointBurstLoc;
+
 	Vector3 menuPos;
 	ArrayList movePath;
 	private int buttonHeight = 25;
-	float moveSpeed = 1.0f;
+	float moveSpeed = 2.0f;
 
 	protected IEnumerator MoveThrough(Tile t){
 		Tile temp = t;
@@ -58,9 +62,18 @@ public class Agent : MonoBehaviour
 		animation.Play("idle");
 	}
 	protected IEnumerator Attack(Tile t){
-		this.transform.LookAt(t.transform);
-		pointBurst = true;
+		this.transform.LookAt(t.center);
+		StartCoroutine(PointBurst(t, 1.0f, damage));
 		yield return StartCoroutine(WaitForAnimation("attack", 1.0f, true));
+	}
+	protected IEnumerator PointBurst(Tile t, float duration, float value){
+		pointBurst = true;
+		damageText = "" + value;
+		pointBurstLoc = Camera.main.WorldToScreenPoint(t.center);
+		for (float timer = 0; timer < duration; timer += Time.deltaTime){
+			pointBurstLoc.y -= timer;
+			yield return null;
+		}
 		pointBurst = false;
 	}
 	//Wait for an animation to be a certain amount complete
@@ -170,7 +183,7 @@ public class Agent : MonoBehaviour
 	}
 	public virtual void OnGUI(){
 		if(pointBurst){
-			GUI.Label(new Rect(0, 0, 100, 100), "Some Random Text");
+			GUI.Label(new Rect(pointBurstLoc.x, pointBurstLoc.y, 100, 100), damageText);
 		}
 		if(abilityMenuAlive){
 			//5 is default number of actions. This number will be dynamic later

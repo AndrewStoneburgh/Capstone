@@ -22,18 +22,18 @@ public class ComputerAgent : Agent
 		map.RemoveHighlight ();
 		tempTarget.guest = this;
 		index = tempTarget.index;
-		StartCoroutine(MoveAndAttack(tempTarget));
+		StartCoroutine(MoveAndAttack(tempTarget, t));
 		return true;
 	}
-	IEnumerator MoveAndAttack(Tile t){
-		yield return StartCoroutine(MoveThrough(t));
+	IEnumerator MoveAndAttack(Tile moveTile, Tile attackTile){
+		yield return StartCoroutine(MoveThrough(moveTile));
 		//gameObject.transform.position = new Vector3 (tempTarget.gameObject.transform.position.x, gameObject.transform.position.y, tempTarget.gameObject.transform.position.z);
-		if (dist (t) == 1) {
-			map.tileList[(int)t.index.x, (int)t.index.y].guest.health -= damage;
-			yield return StartCoroutine(Attack(map.tileList[(int)t.index.x, (int)t.index.y]));
+		//Debug.Log(dist (map.tileList[(int)t.index.x, (int)t.index.y]));
+		if (dist (attackTile) == 1) {
+			attackTile.guest.health -= damage;
+			StartCoroutine(Attack(attackTile));
 		}
 	}
-
 	public override void Update()
 	{	
 		base.Update();
