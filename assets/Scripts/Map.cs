@@ -139,12 +139,14 @@ public class Map : MonoBehaviour {
 				}
 				foreach(Tile ti in tileList){
 					ti.setColor(Color.white);
+					ti.inRange = false;
 				}
 			}
 			if(GUI.Button(new Rect(confirmDialogue.x, confirmDialogue.y +25 , 75, 25), "Cancel")){
 				state = GameState.SelectAgent;
 				foreach(Tile ti in tileList){
 					ti.setColor(Color.white);
+					ti.inRange = false;
 				}
 			}
 		}
@@ -180,12 +182,16 @@ public class Map : MonoBehaviour {
 
 		agentList.OrderBy(Agent => Agent.CT);
 		agentList.Reverse();
+		setFocus(waitList.First());
 		if(waitList.First().name == "ComputerAgent(Clone)"){
 			AIStep();
+			foreach(Tile ti in tileList){
+				ti.setColor(Color.white);
+				ti.inRange = false;
+			}
 		}else{
 			state = GameState.SelectAgent;
 		}
-		setFocus(waitList.First());
 	}
 	void setFocus(Agent a){
 		//RemoveHighlight();
@@ -297,6 +303,7 @@ public class Map : MonoBehaviour {
 				highestThreat = a;
 			}
 		}
+		Highlight(focus, Color.red, focus.range);
 		((ComputerAgent)focus).target = highestThreat;
 		if(focus.Action(tileList[(int)highestThreat.index.x, (int)highestThreat.index.y])){
 			state = GameState.End;
@@ -319,8 +326,9 @@ public class Map : MonoBehaviour {
 			tileList[ii,7].guest = a2;
 			//a2.transform.position = tileList[ii,7].transform.position + new Vector3(0,computerAgentPrefab.transform.localScale.y,0);
 			//tileList[ii*2,14].guest = a2;
-			a2.transform.position = tileList[ii, 7].center;
+			a2.transform.position = tileList[ii, 7].center - new Vector3(0, -0.1f, 0);
 			agentList.Add(a2);
+			a2.transform.Rotate(new Vector3(0,180,0));
 			a2.alignment = 2;
 			a2.target = agentList.First();
 			a2.map = this;

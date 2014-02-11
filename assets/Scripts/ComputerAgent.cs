@@ -22,12 +22,16 @@ public class ComputerAgent : Agent
 		map.RemoveHighlight ();
 		tempTarget.guest = this;
 		index = tempTarget.index;
-		//StartCoroutine(MoveThrough(tempTarget));
-		gameObject.transform.position = new Vector3 (tempTarget.gameObject.transform.position.x, gameObject.transform.position.y, tempTarget.gameObject.transform.position.z);
+		StartCoroutine(MoveAndAttack(tempTarget));
+		return true;
+	}
+	IEnumerator MoveAndAttack(Tile t){
+		yield return StartCoroutine(MoveThrough(t));
+		//gameObject.transform.position = new Vector3 (tempTarget.gameObject.transform.position.x, gameObject.transform.position.y, tempTarget.gameObject.transform.position.z);
 		if (dist (t) == 1) {
 			map.tileList[(int)t.index.x, (int)t.index.y].guest.health -= damage;
+			yield return StartCoroutine(Attack(map.tileList[(int)t.index.x, (int)t.index.y]));
 		}
-		return true;
 	}
 
 	public override void Update()
@@ -35,12 +39,12 @@ public class ComputerAgent : Agent
 		base.Update();
 		//Hard-coding 17,17 as center value for now since 33 is the smallest vertex number and thats likely what Ill be using.
 		//If I make it variable, Ill need to set this to width/2, height/2
-		gameObject.transform.position = currentTile.center + new Vector3(0, currentTile.GetComponent<MeshFilter>().mesh.vertices[(currentTile.size/2)*currentTile.size + (currentTile.size/2)].y + 0.5f, 0);
-		if (Map.focus == this) {
+		//gameObject.transform.position = currentTile.center + new Vector3(0, currentTile.GetComponent<MeshFilter>().mesh.vertices[(currentTile.size/2)*currentTile.size + (currentTile.size/2)].y + 0.5f, 0);
+		/*if (Map.focus == this) {
 			gameObject.renderer.material.color = Color.blue;
 		} else {
 			gameObject.renderer.material.color = Color.red;
-		}
+		}*/
 		Debug.DrawLine (gameObject.transform.position, target.gameObject.transform.position, Color.red);
 		//Wont work, dont know why
 		//base.Update();

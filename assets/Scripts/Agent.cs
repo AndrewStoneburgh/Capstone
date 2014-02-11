@@ -36,6 +36,7 @@ public class Agent : MonoBehaviour
 	private int m_x, m_y;
 	public bool abilityMenuAlive = false;
 	public bool infoMenuAlive = false;
+	public bool pointBurst = false;
 	Vector3 menuPos;
 	ArrayList movePath;
 	private int buttonHeight = 25;
@@ -55,6 +56,29 @@ public class Agent : MonoBehaviour
 		}
 		map.state = Map.GameState.SelectAgent;
 		animation.Play("idle");
+	}
+	protected IEnumerator Attack(Tile t){
+		this.transform.LookAt(t.transform);
+		pointBurst = true;
+		yield return StartCoroutine(WaitForAnimation("attack", 1.0f, true));
+		pointBurst = false;
+	}
+	//Wait for an animation to be a certain amount complete
+	//Based on example method from unitygems.com
+	protected IEnumerator WaitForAnimation(string name, float ratio, bool play)
+	{
+		//Get the animation state for the named animation
+		var anim = animation[name];
+		//Play the animation
+		if(play) animation.Play(name);
+		
+		//Loop until the normalized time reports a value
+		//greater than our ratio.  This method of waiting for
+		//an animation accounts for the speed fluctuating as the
+		//animation is played.
+		while(anim.normalizedTime + float.Epsilon + Time.deltaTime < ratio)
+			yield return new WaitForEndOfFrame();
+		
 	}
 	protected IEnumerator MoveTo(Tile t){
 		transform.LookAt(t.center);
@@ -120,6 +144,7 @@ public class Agent : MonoBehaviour
 				threat += damage * threatMultiplier;
 				}
 			hasActed = true;
+			StartCoroutine(Attack(t));
 			return true;
 		case 3:
 			hasActed = true;
@@ -144,6 +169,9 @@ public class Agent : MonoBehaviour
 		menuPos = new Vector3(Input.mousePosition.x, Screen.height - Input.mousePosition.y, Input.mousePosition.z);
 	}
 	public virtual void OnGUI(){
+		if(pointBurst){
+			GUI.Label(new Rect(0, 0, 100, 100), "Some Random Text");
+		}
 		if(abilityMenuAlive){
 			//5 is default number of actions. This number will be dynamic later
 			//The extra number is the header
