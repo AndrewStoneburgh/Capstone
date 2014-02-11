@@ -1,0 +1,2 @@
+Pathfinding treats enemies and allies the same. Characters can move to non-highlighted squares (initial character can move 5 to the right)
+Computer agents dont use pathfinding. It needs to be implemented in order for the movement subroutines to work
