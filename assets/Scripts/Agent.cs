@@ -68,7 +68,7 @@ public class Agent : MonoBehaviour
 	}
 	protected IEnumerator PointBurst(Tile t, float duration, float value){
 		pointBurst = true;
-		damageText = "" + value;
+		damageText = "" + value + "!";
 		pointBurstLoc = Camera.main.WorldToScreenPoint(t.center);
 		for (float timer = 0; timer < duration; timer += Time.deltaTime){
 			pointBurstLoc.y -= timer;

@@ -326,7 +326,8 @@ public class Map : MonoBehaviour {
 			tileList[ii,7].guest = a2;
 			//a2.transform.position = tileList[ii,7].transform.position + new Vector3(0,computerAgentPrefab.transform.localScale.y,0);
 			//tileList[ii*2,14].guest = a2;
-			a2.transform.position = tileList[ii, 7].center - new Vector3(0, -0.1f, 0);
+			//a2.transform.position = tileList[ii, 7].center.x - new Vector3(0, 0.0f, 0);
+			a2.transform.position = new Vector3(tileList[ii, 7].center.x, a2.transform.position.y, tileList[ii, 7].center.z);
 			agentList.Add(a2);
 			a2.transform.Rotate(new Vector3(0,180,0));
 			a2.alignment = 2;

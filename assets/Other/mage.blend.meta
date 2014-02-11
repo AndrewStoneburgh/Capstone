@@ -105,12 +105,13 @@ ModelImporter:
     400098: upper_arm_r
     4300000: Cube
     7400000: Default Take
-    7400002: Attack
+    7400002: attack
     7400004: Die
     7400006: Hit
-    7400008: Idle
-    7400010: Walk
+    7400008: idle
+    7400010: run
     9500000: //RootNode
+    11100000: //RootNode
     13700000: Cube
   materials:
     importMaterials: 1
@@ -132,7 +133,7 @@ ModelImporter:
       takeName: Default Take
       firstFrame: 0
       lastFrame: 17
-      wrapMode: 0
+      wrapMode: 2
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
@@ -254,7 +255,7 @@ ModelImporter:
       maskType: 0
       maskSource: {instanceID: 0}
     - serializedVersion: 16
-      name: Attack
+      name: attack
       takeName: Attack
       firstFrame: 0
       lastFrame: 14
@@ -632,11 +633,11 @@ ModelImporter:
       maskType: 0
       maskSource: {instanceID: 0}
     - serializedVersion: 16
-      name: Idle
+      name: idle
       takeName: Idle
       firstFrame: 0
       lastFrame: 24
-      wrapMode: 0
+      wrapMode: 2
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
@@ -758,11 +759,11 @@ ModelImporter:
       maskType: 0
       maskSource: {instanceID: 0}
     - serializedVersion: 16
-      name: Walk
+      name: run
       takeName: Walk
       firstFrame: 0
       lastFrame: 24
-      wrapMode: 0
+      wrapMode: 2
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
@@ -918,5 +919,5 @@ ModelImporter:
     feetSpacing: 0
     rootMotionBoneName: 
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 1
   userData: 
